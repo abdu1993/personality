@@ -12,7 +12,7 @@ import time
 from fastai import *
 from fastai.text import *
 
-model_file_url = 'https://drive.google.com/uc?export=download&id=1m09MYFgZ7_FGMbMNMCEoPfK332stCSlv'
+model_file_url = 'https://drive.google.com/uc?export=download&id=1xjqUCB912sMTGp3Y6NTwoPODsM1pdPGc'
 model_file_name = 'poetmodel'
 path = Path(__file__).parent
 
