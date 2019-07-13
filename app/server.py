@@ -55,32 +55,28 @@ async def analyze(request):
     return JSONResponse({'result': textResponse(data)})
 
 def textResponse(data):
-    csv_string = learn.predict(data['file'], 40, temperature=1.1, min_p=0.001)
+    
+    t = t = {'INTJ':'INTJ - Architect - Imaginative and stratigic thinkers with a plan for everything.',
+    'INTP':'INTP - Logician - Innovative inventors with an unquenchable thirst for knowledge.',
+    'ENTJ':'ENTJ - Commander - Bold, imaginative, and strong willed leaders, always finding a way - or making one.',
+    'ENTP':'ENTP - Debater - Smart and curious thinkers who cannot resist an intellectual challenge.',
+    'INFJ':'INFJ - Advocate - Quiet and mystical, yet very inspiring and tireless idealists.',
+    'INFP':'INFP - Mediator - Poetic, kind, and altruistic people, always eager to help a good cause.',
+    'ENFJ':'ENFJ - Protagonist - Charismatic and inspiring leaders, able to mesmerize their listeners.',
+    'ENFP':'ENFP - Campaigner - Enthusiastic, creative, and sociable free spirits, who can always find a reason to smile.',
+    'ISTJ':'ISTJ - Logistician - Practical and fact-minded individuals, whose reliability cannot be doubted.',
+    'ISFJ':'ISFJ - Defender - Very dedicated and warm protectors, always ready to defend their loved ones.',
+    'ESTJ':'ESTJ - Executive - Excellent administrators, unsurpassed at managing things - or people.',
+    'ESFJ':'ESFJ - Consul - Extraordinarily caring, social, and popular people, always eager to help.',
+    'ISTP':'ISTP - Virtuoso - Bold and practical experimenters, masters of all kinds of tools.',
+    'ISFP':'ISFP - Adventurer - Flexible and charming artists, always ready to explore and experience something new.',
+    'ESTP':'ESTP - Entrepreneur - Smart, energetic, and very perceptive people, who truly enjoy living on the edge.',
+    'ESFP':'ESFP - Entertainer - Spontaneous, energetic, and enthusiastic people - life is never boring around them.'}
+    
+    pred = learn.predict(data['file'])
     time.sleep(2)
-
-    words = csv_string.split()
-    for i, word in enumerate(words):
-        if word == 'xxbos':
-            words[i] = '<br/>'
-        elif word == 'xxmaj':
-            words[i+1] = words[i+1][0].upper() + words[i+1][1:]
-            words[i] = ''
-        elif word == 'xxup':
-            words[i+1] = words[i+1].upper()
-            words[i] = ''     
-        elif word == 'xxunk' or word == '(' or word == ')' or word == '"':
-            words[i] = ''   
-        elif word == ',':
-            words[i] = ''
-        elif word == '.' or word == '?' or word == '!' or word == ';':
-            words[i-1]+= words[i]
-            words[i] = ''
-        elif word[0] == "'":
-            words[i-1]+= words[i]
-            words[i] = ''
-
-    return ' '.join(words)
+    pred = str(pred[0])
+    return t.get(pred, 0)
 
 if __name__ == '__main__':
     if 'serve' in sys.argv: uvicorn.run(app, host='0.0.0.0', port=5042)
-
