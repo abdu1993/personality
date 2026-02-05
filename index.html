@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic Speed Reader - تدريب القراءة السريعة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: #8892b0;
+            font-size: 1.1rem;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #e94560;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #8892b0;
+            margin-top: 5px;
+        }
+
+        .display-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 30px 0;
+            text-align: center;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid rgba(233, 69, 96, 0.3);
+            position: relative;
+        }
+
+        .word-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #fff;
+            transition: opacity 0.1s ease;
+            font-family: 'Traditional Arabic', 'Arabic Typesetting', 'Scheherazade', serif;
+            line-height: 1.5;
+        }
+
+        .word-display.hidden {
+            opacity: 0;
+        }
+
+        .level-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .speed-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .response-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .response-btn {
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .response-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-correct {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: #fff;
+        }
+
+        .btn-correct:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 184, 148, 0.4);
+        }
+
+        .btn-wrong {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: #fff;
+        }
+
+        .btn-wrong:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .controls h3 {
+            margin-bottom: 20px;
+            color: #e94560;
+        }
+
+        .control-group {
+            margin: 20px 0;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #8892b0;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e94560;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 80px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: #fff;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .instructions h3 {
+            color: #e94560;
+            margin-bottom: 15px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            color: #8892b0;
+        }
+
+        .instructions li {
+            padding: 8px 0;
+            padding-right: 25px;
+            position: relative;
+        }
+
+        .instructions li::before {
+            content: "◆";
+            position: absolute;
+            right: 0;
+            color: #e94560;
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 100;
+            animation: fadeOut 0.8s ease forwards;
+        }
+
+        .feedback.correct {
+            background: rgba(0, 184, 148, 0.9);
+        }
+
+        .feedback.wrong {
+            background: rgba(233, 69, 96, 0.9);
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            70% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        }
+
+        .difficulty-levels {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .level-btn {
+            padding: 10px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .level-btn.active {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            border-color: transparent;
+        }
+
+        .level-btn:hover:not(.active) {
+            border-color: #e94560;
+        }
+
+        .auto-mode {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(30px);
+        }
+
+        @media (max-width: 600px) {
+            .word-display {
+                font-size: 2.5rem;
+            }
+
+            .stats-bar {
+                gap: 15px;
+            }
+
+            .stat {
+                min-width: 100px;
+                padding: 12px 18px;
+            }
+
+            .response-btn {
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>تدريب القراءة السريعة</h1>
+            <p>Arabic Speed Reader - Improve your Arabic reading speed</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">النقاط</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="streak">0</div>
+                <div class="stat-label">متتالية</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="accuracy">0%</div>
+                <div class="stat-label">الدقة</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="wpm">0</div>
+                <div class="stat-label">كلمة/دقيقة</div>
+            </div>
+        </div>
+
+        <div class="display-area">
+            <div class="level-indicator">المستوى: <span id="current-level">1</span></div>
+            <div class="speed-indicator"><span id="current-speed">1000</span> مللي ثانية</div>
+            <div class="word-display" id="word-display">اضغط ابدأ للبدء</div>
+        </div>
+
+        <div class="response-buttons">
+            <button class="response-btn btn-correct" id="btn-correct" disabled>قرأتها ✓</button>
+            <button class="response-btn btn-wrong" id="btn-wrong" disabled>لم أستطع ✗</button>
+        </div>
+
+        <div class="controls">
+            <h3>الإعدادات</h3>
+
+            <div class="control-group">
+                <label>سرعة العرض (مللي ثانية)</label>
+                <div class="slider-container">
+                    <input type="range" id="speed-slider" min="100" max="3000" value="1000" step="50">
+                    <div class="slider-value"><span id="speed-value">1000</span> ms</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>حجم الخط</label>
+                <div class="slider-container">
+                    <input type="range" id="font-slider" min="2" max="8" value="4" step="0.5">
+                    <div class="slider-value"><span id="font-value">4</span> rem</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>مستوى الصعوبة</label>
+                <div class="difficulty-levels">
+                    <button class="level-btn active" data-level="1">١ - كلمات قصيرة</button>
+                    <button class="level-btn" data-level="2">٢ - كلمات متوسطة</button>
+                    <button class="level-btn" data-level="3">٣ - كلمات طويلة</button>
+                    <button class="level-btn" data-level="4">٤ - عبارات</button>
+                    <button class="level-btn" data-level="5">٥ - جمل</button>
+                </div>
+            </div>
+
+            <div class="auto-mode">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-adjust" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>تعديل تلقائي للصعوبة</span>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="level-progress" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn btn-start" id="btn-start">ابدأ التدريب</button>
+            <button class="action-btn btn-reset" id="btn-reset">إعادة تعيين</button>
+        </div>
+
+        <div class="instructions">
+            <h3>كيفية الاستخدام</h3>
+            <ul>
+                <li>اضغط على "ابدأ التدريب" لبدء عرض الكلمات</li>
+                <li>حاول قراءة الكلمة قبل أن تختفي</li>
+                <li>اضغط "قرأتها" إذا استطعت قراءتها، أو "لم أستطع" إذا لم تستطع</li>
+                <li>سيتم تعديل السرعة والصعوبة تلقائياً بناءً على أدائك</li>
+                <li>استخدم مفاتيح الاختصار: مسافة = قرأتها، X = لم أستطع</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Real Arabic words database organized by difficulty
+        const arabicWords = {
+            // Level 1: Short common words (2-3 letters)
+            1: [
+                "أنا", "هو", "هي", "نحن", "هم", "أنت", "من", "ما", "في", "على",
+                "إلى", "عن", "مع", "هذا", "هذه", "ذلك", "تلك", "كل", "بعض", "أي",
+                "قد", "لم", "لن", "إن", "أن", "كان", "يكون", "له", "لها", "بها",
+                "فيه", "منه", "عنه", "به", "لي", "بي", "أو", "ثم", "حتى", "إذا",
+                "لكن", "بل", "نعم", "لا", "كيف", "أين", "متى", "لماذا", "كم", "هل",
+                "باب", "بيت", "يوم", "ليل", "نور", "ماء", "نار", "هواء", "أرض", "سماء",
+                "قلب", "عين", "يد", "رأس", "فم", "أذن", "أنف", "وجه", "شعر", "جسم",
+                "أب", "أم", "أخ", "أخت", "ابن", "بنت", "جد", "جدة", "عم", "خال"
+            ],
+            // Level 2: Medium words (4-5 letters)
+            2: [
+                "كتاب", "قلم", "ورقة", "مدرسة", "طالب", "معلم", "صديق", "جميل", "كبير", "صغير",
+                "جديد", "قديم", "سريع", "بطيء", "طويل", "قصير", "واسع", "ضيق", "عميق", "سطحي",
+                "حقيقة", "خيال", "عقل", "فكرة", "رأي", "قرار", "عمل", "راحة", "سفر", "إقامة",
+                "صباح", "مساء", "ظهر", "عصر", "شروق", "غروب", "فجر", "ليلة", "نهار", "أسبوع",
+                "شهر", "سنة", "عام", "قرن", "دقيقة", "ساعة", "لحظة", "وقت", "زمن", "عصر",
+                "مدينة", "قرية", "شارع", "طريق", "جسر", "نهر", "بحر", "جبل", "غابة", "صحراء",
+                "طعام", "شراب", "خبز", "لحم", "سمك", "فاكهة", "خضار", "حليب", "عسل", "زيت",
+                "سعادة", "حزن", "فرح", "غضب", "خوف", "أمان", "حب", "كره", "أمل", "يأس"
+            ],
+            // Level 3: Longer words (6+ letters)
+            3: [
+                "مستشفى", "جامعة", "مكتبة", "مطعم", "فندق", "مطار", "محطة", "سوق", "متجر", "مصنع",
+                "حكومة", "وزارة", "رئاسة", "برلمان", "دستور", "قانون", "محكمة", "شرطة", "جيش", "سلام",
+                "تكنولوجيا", "حاسوب", "إنترنت", "هاتف", "تلفاز", "راديو", "صحيفة", "مجلة", "كتاب", "رواية",
+                "اقتصاد", "تجارة", "صناعة", "زراعة", "استثمار", "ميزانية", "ضريبة", "راتب", "أرباح", "خسائر",
+                "مستقبل", "حاضر", "ماضي", "تاريخ", "جغرافيا", "علوم", "رياضيات", "فيزياء", "كيمياء", "أحياء",
+                "فلسفة", "منطق", "أخلاق", "دين", "ثقافة", "حضارة", "تراث", "فنون", "موسيقى", "رسم",
+                "طبيب", "مهندس", "محامي", "صحفي", "كاتب", "شاعر", "فنان", "رياضي", "عالم", "باحث",
+                "مسؤولية", "التزام", "واجب", "حق", "حرية", "عدالة", "مساواة", "ديمقراطية", "استقلال", "وحدة"
+            ],
+            // Level 4: Two-word phrases
+            4: [
+                "صباح الخير", "مساء النور", "أهلاً وسهلاً", "مع السلامة", "شكراً جزيلاً",
+                "عفواً منك", "من فضلك", "لا بأس", "إن شاء الله", "ما شاء الله",
+                "الحمد لله", "سبحان الله", "الله أكبر", "لا حول", "بسم الله",
+                "كيف حالك", "أنا بخير", "ما اسمك", "من أين", "إلى أين",
+                "يوم جميل", "ليلة سعيدة", "عام جديد", "عيد مبارك", "رمضان كريم",
+                "قراءة ممتعة", "رحلة موفقة", "عمل ناجح", "حياة كريمة", "صحة جيدة",
+                "العالم العربي", "الشرق الأوسط", "شمال أفريقيا", "الخليج العربي", "البحر المتوسط",
+                "اللغة العربية", "الأدب العربي", "التاريخ الإسلامي", "الفن المعماري", "الموسيقى الشرقية",
+                "التعليم العالي", "البحث العلمي", "التطور التقني", "النمو الاقتصادي", "التنمية المستدامة",
+                "حقوق الإنسان", "السلام العالمي", "التعاون الدولي", "العلاقات الدبلوماسية", "الأمم المتحدة"
+            ],
+            // Level 5: Short sentences
+            5: [
+                "العلم نور والجهل ظلام",
+                "الصبر مفتاح الفرج",
+                "من جد وجد ومن زرع حصد",
+                "اطلبوا العلم من المهد إلى اللحد",
+                "القراءة غذاء العقل والروح",
+                "الوقت كالسيف إن لم تقطعه قطعك",
+                "خير الكلام ما قل ودل",
+                "العقل السليم في الجسم السليم",
+                "الصديق وقت الضيق",
+                "رب أخ لك لم تلده أمك",
+                "الكتاب خير جليس في الزمان",
+                "من سار على الدرب وصل",
+                "لكل مجتهد نصيب من النجاح",
+                "التعلم في الصغر كالنقش على الحجر",
+                "يد واحدة لا تصفق وحدها",
+                "المثابرة طريق النجاح والتفوق",
+                "الحياة مدرسة نتعلم منها كل يوم",
+                "السفر يفتح العقول ويوسع المدارك",
+                "الصحة تاج على رؤوس الأصحاء",
+                "العمل الجاد يصنع المعجزات الكبيرة"
+            ]
+        };
+
+        // App State
+        const state = {
+            isRunning: false,
+            currentWord: '',
+            currentLevel: 1,
+            speed: 1000,
+            fontSize: 4,
+            score: 0,
+            streak: 0,
+            totalAttempts: 0,
+            correctAttempts: 0,
+            wordsPerMinute: 0,
+            sessionStartTime: null,
+            wordsShownInSession: 0,
+            autoAdjust: true,
+            levelProgress: 0,
+            consecutiveCorrect: 0,
+            consecutiveWrong: 0,
+            timeout: null,
+            waitingForResponse: false
+        };
+
+        // DOM Elements
+        const wordDisplay = document.getElementById('word-display');
+        const btnStart = document.getElementById('btn-start');
+        const btnReset = document.getElementById('btn-reset');
+        const btnCorrect = document.getElementById('btn-correct');
+        const btnWrong = document.getElementById('btn-wrong');
+        const speedSlider = document.getElementById('speed-slider');
+        const fontSlider = document.getElementById('font-slider');
+        const speedValue = document.getElementById('speed-value');
+        const fontValue = document.getElementById('font-value');
+        const autoAdjustToggle = document.getElementById('auto-adjust');
+        const levelButtons = document.querySelectorAll('.level-btn');
+        const currentLevelDisplay = document.getElementById('current-level');
+        const currentSpeedDisplay = document.getElementById('current-speed');
+        const levelProgress = document.getElementById('level-progress');
+        const scoreDisplay = document.getElementById('score');
+        const streakDisplay = document.getElementById('streak');
+        const accuracyDisplay = document.getElementById('accuracy');
+        const wpmDisplay = document.getElementById('wpm');
+
+        // Initialize
+        function init() {
+            loadState();
+            updateUI();
+            setupEventListeners();
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            const saveData = {
+                currentLevel: state.currentLevel,
+                speed: state.speed,
+                fontSize: state.fontSize,
+                score: state.score,
+                totalAttempts: state.totalAttempts,
+                correctAttempts: state.correctAttempts,
+                autoAdjust: state.autoAdjust
+            };
+            localStorage.setItem('arabicSpeedReader', JSON.stringify(saveData));
+        }
+
+        // Load state from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('arabicSpeedReader');
+            if (saved) {
+                const data = JSON.parse(saved);
+                state.currentLevel = data.currentLevel || 1;
+                state.speed = data.speed || 1000;
+                state.fontSize = data.fontSize || 4;
+                state.score = data.score || 0;
+                state.totalAttempts = data.totalAttempts || 0;
+                state.correctAttempts = data.correctAttempts || 0;
+                state.autoAdjust = data.autoAdjust !== undefined ? data.autoAdjust : true;
+
+                speedSlider.value = state.speed;
+                fontSlider.value = state.fontSize;
+                autoAdjustToggle.checked = state.autoAdjust;
+            }
+        }
+
+        // Update UI elements
+        function updateUI() {
+            speedValue.textContent = state.speed;
+            fontValue.textContent = state.fontSize;
+            currentLevelDisplay.textContent = state.currentLevel;
+            currentSpeedDisplay.textContent = state.speed;
+            wordDisplay.style.fontSize = state.fontSize + 'rem';
+            scoreDisplay.textContent = state.score;
+            streakDisplay.textContent = state.streak;
+
+            const accuracy = state.totalAttempts > 0
+                ? Math.round((state.correctAttempts / state.totalAttempts) * 100)
+                : 0;
+            accuracyDisplay.textContent = accuracy + '%';
+            wpmDisplay.textContent = state.wordsPerMinute;
+
+            levelProgress.style.width = (state.levelProgress * 100) + '%';
+
+            levelButtons.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.level) === state.currentLevel);
+            });
+        }
+
+        // Get random word from current level
+        function getRandomWord() {
+            const words = arabicWords[state.currentLevel];
+            const randomIndex = Math.floor(Math.random() * words.length);
+            return words[randomIndex];
+        }
+
+        // Show next word
+        function showNextWord() {
+            if (!state.isRunning) return;
+
+            state.currentWord = getRandomWord();
+            wordDisplay.textContent = state.currentWord;
+            wordDisplay.classList.remove('hidden');
+
+            btnCorrect.disabled = false;
+            btnWrong.disabled = false;
+            state.waitingForResponse = true;
+
+            // Hide word after specified time
+            state.timeout = setTimeout(() => {
+                wordDisplay.classList.add('hidden');
+            }, state.speed);
+        }
+
+        // Handle correct response
+        function handleCorrect() {
+            if (!state.waitingForResponse) return;
+
+            state.waitingForResponse = false;
+            clearTimeout(state.timeout);
+
+            state.score += state.currentLevel * 10;
+            state.streak++;
+            state.totalAttempts++;
+            state.correctAttempts++;
+            state.wordsShownInSession++;
+            state.consecutiveCorrect++;
+            state.consecutiveWrong = 0;
+
+            showFeedback(true);
+            adjustDifficulty();
+            updateWPM();
+            updateUI();
+            saveState();
+
+            btnCorrect.disabled = true;
+            btnWrong.disabled = true;
+
+            // Show next word after a brief pause
+            setTimeout(showNextWord, 500);
+        }
+
+        // Handle wrong response
+        function handleWrong() {
+            if (!state.waitingForResponse) return;
+
+            state.waitingForResponse = false;
+            clearTimeout(state.timeout);
+
+            state.streak = 0;
+            state.totalAttempts++;
+            state.wordsShownInSession++;
+            state.consecutiveWrong++;
+            state.consecutiveCorrect = 0;
+
+            showFeedback(false);
+            adjustDifficulty();
+            updateWPM();
+            updateUI();
+            saveState();
+
+            btnCorrect.disabled = true;
+            btnWrong.disabled = true;
+
+            // Show the word they missed
+            wordDisplay.textContent = state.currentWord;
+            wordDisplay.classList.remove('hidden');
+
+            // Show next word after a longer pause so they can see what they missed
+            setTimeout(showNextWord, 1500);
+        }
+
+        // Show visual feedback
+        function showFeedback(isCorrect) {
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback ' + (isCorrect ? 'correct' : 'wrong');
+            feedback.textContent = isCorrect ? 'ممتاز!' : 'حاول مرة أخرى';
+            document.body.appendChild(feedback);
+
+            setTimeout(() => feedback.remove(), 800);
+        }
+
+        // Adjust difficulty based on performance
+        function adjustDifficulty() {
+            if (!state.autoAdjust) return;
+
+            // Increase difficulty after 5 consecutive correct answers
+            if (state.consecutiveCorrect >= 5) {
+                state.levelProgress += 0.2;
+                state.consecutiveCorrect = 0;
+
+                // Speed up
+                if (state.speed > 200) {
+                    state.speed = Math.max(200, state.speed - 50);
+                    speedSlider.value = state.speed;
+                }
+
+                // Level up when progress is complete
+                if (state.levelProgress >= 1 && state.currentLevel < 5) {
+                    state.currentLevel++;
+                    state.levelProgress = 0;
+                    state.speed = Math.min(state.speed + 300, 2000); // Reset speed a bit for new level
+                    speedSlider.value = state.speed;
+                }
+            }
+
+            // Decrease difficulty after 3 consecutive wrong answers
+            if (state.consecutiveWrong >= 3) {
+                state.consecutiveWrong = 0;
+
+                // Slow down
+                if (state.speed < 3000) {
+                    state.speed = Math.min(3000, state.speed + 100);
+                    speedSlider.value = state.speed;
+                }
+
+                // Level down if struggling
+                if (state.levelProgress > 0) {
+                    state.levelProgress = Math.max(0, state.levelProgress - 0.3);
+                } else if (state.currentLevel > 1) {
+                    state.currentLevel--;
+                    state.levelProgress = 0.5;
+                }
+            }
+        }
+
+        // Update words per minute calculation
+        function updateWPM() {
+            if (!state.sessionStartTime) return;
+
+            const elapsedMinutes = (Date.now() - state.sessionStartTime) / 60000;
+            if (elapsedMinutes > 0) {
+                state.wordsPerMinute = Math.round(state.wordsShownInSession / elapsedMinutes);
+            }
+        }
+
+        // Start training
+        function startTraining() {
+            state.isRunning = true;
+            state.sessionStartTime = Date.now();
+            state.wordsShownInSession = 0;
+            btnStart.textContent = 'إيقاف';
+            wordDisplay.textContent = 'استعد...';
+
+            setTimeout(showNextWord, 1000);
+        }
+
+        // Stop training
+        function stopTraining() {
+            state.isRunning = false;
+            state.waitingForResponse = false;
+            clearTimeout(state.timeout);
+            btnStart.textContent = 'ابدأ التدريب';
+            wordDisplay.textContent = 'اضغط ابدأ للبدء';
+            wordDisplay.classList.remove('hidden');
+            btnCorrect.disabled = true;
+            btnWrong.disabled = true;
+        }
+
+        // Reset all progress
+        function resetProgress() {
+            if (confirm('هل أنت متأكد من إعادة تعيين كل التقدم؟')) {
+                stopTraining();
+                state.currentLevel = 1;
+                state.speed = 1000;
+                state.score = 0;
+                state.streak = 0;
+                state.totalAttempts = 0;
+                state.correctAttempts = 0;
+                state.wordsPerMinute = 0;
+                state.levelProgress = 0;
+                state.consecutiveCorrect = 0;
+                state.consecutiveWrong = 0;
+
+                speedSlider.value = 1000;
+                localStorage.removeItem('arabicSpeedReader');
+                updateUI();
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            btnStart.addEventListener('click', () => {
+                if (state.isRunning) {
+                    stopTraining();
+                } else {
+                    startTraining();
+                }
+            });
+
+            btnReset.addEventListener('click', resetProgress);
+
+            btnCorrect.addEventListener('click', handleCorrect);
+            btnWrong.addEventListener('click', handleWrong);
+
+            speedSlider.addEventListener('input', (e) => {
+                state.speed = parseInt(e.target.value);
+                updateUI();
+                saveState();
+            });
+
+            fontSlider.addEventListener('input', (e) => {
+                state.fontSize = parseFloat(e.target.value);
+                updateUI();
+                saveState();
+            });
+
+            autoAdjustToggle.addEventListener('change', (e) => {
+                state.autoAdjust = e.target.checked;
+                saveState();
+            });
+
+            levelButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.currentLevel = parseInt(btn.dataset.level);
+                    state.levelProgress = 0;
+                    updateUI();
+                    saveState();
+                });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && state.waitingForResponse) {
+                    e.preventDefault();
+                    handleCorrect();
+                } else if (e.code === 'KeyX' && state.waitingForResponse) {
+                    e.preventDefault();
+                    handleWrong();
+                } else if (e.code === 'Enter' && !state.isRunning) {
+                    startTraining();
+                } else if (e.code === 'Escape' && state.isRunning) {
+                    stopTraining();
+                }
+            });
+        }
+
+        // Initialize app
+        init();
+    </script>
+</body>
+</html>
