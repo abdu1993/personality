@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-card: #12121a;
+  --bg-card-hover: #1a1a25;
+  --border-color: #2a2a3a;
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --accent-blue: #3b82f6;
+  --accent-yellow: #eab308;
+  --accent-purple: #a855f7;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.card {
+  @apply rounded-lg border p-4;
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.card:hover {
+  background-color: var(--bg-card-hover);
+}
+
+.score-badge {
+  @apply inline-flex items-center justify-center rounded-full text-sm font-semibold px-3 py-1;
+}
+
+.score-high { @apply bg-green-500/20 text-green-400; }
+.score-mid { @apply bg-yellow-500/20 text-yellow-400; }
+.score-low { @apply bg-red-500/20 text-red-400; }
