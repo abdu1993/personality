@@ -6,8 +6,6 @@ on:
       - main
       - master
       - claude/etf-comparison-tool-WGNFT
-    paths:
-      - 'docs/**'
   workflow_dispatch:
 
 permissions:
